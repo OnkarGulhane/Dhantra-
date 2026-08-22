@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
+import MobileBottomNav from '../components/layout/MobileBottomNav';
 import ExpenseFormModal from '../components/expense/ExpenseFormModal';
 
 export const MainLayout = ({ children, activeTab, onTabChange }) => {
@@ -27,6 +28,12 @@ export const MainLayout = ({ children, activeTab, onTabChange }) => {
           {children}
         </main>
       </div>
+
+      <MobileBottomNav
+        activeTab={activeTab}
+        onTabChange={onTabChange}
+        onQuickAddExpense={() => setIsAddExpenseModalOpen(true)}
+      />
 
       <ExpenseFormModal
         isOpen={isAddExpenseModalOpen}

@@ -6,6 +6,7 @@ import MainLayout from './layouts/MainLayout';
 import Dashboard from './pages/Dashboard';
 import ExpensesPage from './pages/Expenses';
 import CategoriesPage from './pages/Categories';
+import BudgetsPage from './pages/Budgets';
 import NotFound from './pages/NotFound';
 
 export const App = () => {
@@ -19,6 +20,8 @@ export const App = () => {
         return <ExpensesPage />;
       case 'categories':
         return <CategoriesPage />;
+      case 'budgets':
+        return <BudgetsPage />;
       default:
         return <NotFound onGoHome={() => setCurrentTab('dashboard')} />;
     }

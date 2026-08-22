@@ -3,6 +3,7 @@ import Card from '../components/common/Card';
 import Table from '../components/common/Table';
 import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
+import CategoryPieChart from '../components/dashboard/CategoryPieChart';
 import { useApp } from '../context/AppContext';
 
 export const Dashboard = () => {
@@ -21,13 +22,6 @@ export const Dashboard = () => {
   const totalCount = expenses.length;
   const avgAmount = totalCount > 0 ? (totalAmount / totalCount).toFixed(2) : 0;
   const categoryCount = categories.length;
-
-  // Category distribution calculation
-  const categoryTotals = {};
-  expenses.forEach(exp => {
-    const catName = exp.category?.name || 'Uncategorized';
-    categoryTotals[catName] = (categoryTotals[catName] || 0) + Number(exp.amount || 0);
-  });
 
   const columns = [
     {
@@ -181,33 +175,8 @@ export const Dashboard = () => {
         </Card>
       </div>
 
-      {/* CATEGORY BREAKDOWN VISUAL BARS */}
-      {Object.keys(categoryTotals).length > 0 && (
-        <Card title="Spending Breakdown by Category">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '0.5rem' }}>
-            {Object.entries(categoryTotals).map(([catName, amt]) => {
-              const pct = totalAmount > 0 ? ((amt / totalAmount) * 100).toFixed(1) : 0;
-              return (
-                <div key={catName}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-                    <span style={{ fontWeight: 600 }}>{catName}</span>
-                    <span>₹{amt.toLocaleString('en-IN')} ({pct}%)</span>
-                  </div>
-                  <div style={{ height: 8, backgroundColor: 'var(--bg-app)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
-                    <div style={{
-                      width: `${pct}%`,
-                      height: '100%',
-                      background: 'linear-gradient(90deg, var(--primary-500), var(--accent-purple))',
-                      borderRadius: 'var(--radius-full)',
-                      transition: 'width 0.5s ease-in-out'
-                    }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      )}
+      {/* CATEGORY DISTRIBUTION PIE DIAGRAM */}
+      <CategoryPieChart expenses={expenses} />
 
       {/* RECENT TRANSACTIONS TABLE */}
       <Card title="Recent Transactions" subtitle="Latest expense items logged in the system">

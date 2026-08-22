@@ -7,20 +7,19 @@ export const Navbar = ({ activeTab, onQuickAddExpense, onMobileMenuToggle }) => 
 
   return (
     <header className="navbar">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
         <button
-          className="btn btn-ghost btn-icon-only"
+          className="btn btn-ghost btn-icon-only mobile-hamburger-btn"
           onClick={onMobileMenuToggle}
-          style={{ display: 'none' }} // Mobile responsive toggle
           aria-label="Toggle menu"
         >
           ☰
         </button>
         <div>
           <h2 style={{ fontSize: '1.25rem', textTransform: 'capitalize' }}>
-            {activeTab}
+            {activeTab === 'budgets' ? 'Budgets & Goals' : activeTab}
           </h2>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          <p className="navbar-subtitle" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             Welcome back to your financial control center
           </p>
         </div>
