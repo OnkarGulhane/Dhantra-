@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS category (
 );
 
 -- Case-insensitive unique index for category name
-CREATE UNIQUE INDEX idx_category_name_lower ON category (LOWER(name));
+CREATE INDEX IF NOT EXISTS idx_category_name_lower ON category (name);
 
 -- 2. Seed Default 7 Categories
 INSERT INTO category (name, description) VALUES
@@ -21,17 +21,17 @@ INSERT INTO category (name, description) VALUES
     ('Bills', 'Utilities, rent, internet, phone bills'),
     ('Health', 'Medical, pharmacy, fitness, wellness'),
     ('Entertainment', 'Movies, events, hobbies, subscriptions'),
-    ('Other', 'Miscellaneous expenses')
-ON CONFLICT (name) DO NOTHING;
+    ('Other', 'Miscellaneous expenses');
 
 -- 3. Add Foreign Key Column category_id to expense
 ALTER TABLE expense ADD COLUMN IF NOT EXISTS category_id BIGINT;
 
 -- 4. Backfill Existing Expense Records to Seeded Category IDs
-UPDATE expense e
-SET category_id = c.id
-FROM category c
-WHERE LOWER(e.category) = LOWER(c.name);
+UPDATE expense
+SET category_id = (
+    SELECT c.id FROM category c WHERE LOWER(expense.category) = LOWER(c.name)
+)
+WHERE category_id IS NULL AND category IS NOT NULL;
 
 -- Default any unmapped expenses to 'Other' category
 UPDATE expense

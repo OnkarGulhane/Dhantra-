@@ -1,78 +1,166 @@
-import React, { useState, useEffect } from "react";
-import { expenseService } from "../services/expenseService";
-import { ExpenseTable } from "../components/expense/ExpenseTable";
-import { ExpenseForm } from "../components/expense/ExpenseForm";
+import React, { useState, useMemo } from 'react';
+import Card from '../components/common/Card';
+import Table from '../components/common/Table';
+import Button from '../components/common/Button';
+import Input from '../components/common/Input';
+import Select from '../components/common/Select';
+import Loader from '../components/common/Loader';
+import ErrorMessage from '../components/common/ErrorMessage';
+import ExpenseFormModal from '../components/expense/ExpenseFormModal';
+import { useApp } from '../context/AppContext';
 
 export const ExpensesPage = () => {
-    const [expenses, setExpenses] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [editingExpense, setEditingExpense] = useState(null);
+  const { expenses, categories, isExpensesLoading, expensesError, fetchExpenses, deleteExpense } = useApp();
 
-    const loadExpenses = async () => {
-        try {
-            setLoading(true);
-            const data = await expenseService.getAllExpenses();
-            setExpenses(data || []);
-        } catch (err) {
-            console.error("Error loading expenses:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
-    useEffect(() => {
-        loadExpenses();
-    }, []);
+  // Filtered expenses calculation
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter((exp) => {
+      const matchesSearch = exp.title.toLowerCase().includes(search.toLowerCase()) ||
+                            (exp.description && exp.description.toLowerCase().includes(search.toLowerCase()));
+      const matchesCategory = selectedCategory ? String(exp.category?.id) === String(selectedCategory) : true;
+      return matchesSearch && matchesCategory;
+    });
+  }, [expenses, search, selectedCategory]);
 
-    const handleSave = async (formData) => {
-        try {
-            if (editingExpense) {
-                await expenseService.updateExpense(editingExpense.id, formData);
-            } else {
-                await expenseService.createExpense(formData);
-            }
-            setEditingExpense(null);
-            loadExpenses();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        }
-    };
+  const totalFilteredAmount = filteredExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this expense?")) return;
-        try {
-            await expenseService.deleteExpense(id);
-            loadExpenses();
-        } catch (err) {
-            alert(`Error: ${err.message}`);
-        }
-    };
+  const handleDelete = async (id, title) => {
+    if (window.confirm(`Are you sure you want to delete expense "${title}"?`)) {
+      setDeletingId(id);
+      try {
+        await deleteExpense(id, title);
+      } finally {
+        setDeletingId(null);
+      }
+    }
+  };
 
-    return (
-        <div className="page-expenses">
-            <h2>Expense Tracker</h2>
-            <div className="expenses-layout">
-                <div className="form-column">
-                    <h3>{editingExpense ? "Edit Expense" : "Record Expense"}</h3>
-                    <ExpenseForm
-                        onSubmit={handleSave}
-                        initialData={editingExpense}
-                        onCancel={editingExpense ? () => setEditingExpense(null) : null}
-                    />
-                </div>
-                <div className="table-column">
-                    <h3>All Expenses</h3>
-                    {loading ? <div>Loading expenses...</div> : (
-                        <ExpenseTable
-                            expenses={expenses}
-                            onEdit={(exp) => setEditingExpense(exp)}
-                            onDelete={handleDelete}
-                        />
-                    )}
-                </div>
-            </div>
+  const columns = [
+    {
+      header: 'Title',
+      accessor: 'title',
+      render: (item) => (
+        <div>
+          <div style={{ fontWeight: 600 }}>{item.title}</div>
+          {item.description && (
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{item.description}</div>
+          )}
         </div>
-    );
+      )
+    },
+    {
+      header: 'Category',
+      render: (item) => (
+        <span className="badge badge-primary">
+          {item.category?.name || 'Uncategorized'}
+        </span>
+      )
+    },
+    {
+      header: 'Expense Date',
+      accessor: 'expenseDate',
+      render: (item) => new Date(item.expenseDate).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })
+    },
+    {
+      header: 'Amount',
+      align: 'right',
+      render: (item) => (
+        <span style={{ fontWeight: 700, color: 'var(--color-danger)' }}>
+          ₹{Number(item.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        </span>
+      )
+    },
+    {
+      header: 'Actions',
+      align: 'center',
+      render: (item) => (
+        <Button
+          variant="danger"
+          size="sm"
+          isLoading={deletingId === item.id}
+          onClick={() => handleDelete(item.id, item.title)}
+        >
+          Delete
+        </Button>
+      )
+    }
+  ];
+
+  if (isExpensesLoading) return <Loader message="Loading expenses list..." />;
+  if (expensesError) return <ErrorMessage message={expensesError} onRetry={fetchExpenses} />;
+
+  const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }));
+
+  return (
+    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* HEADER & FILTER BAR */}
+      <Card>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: '1rem', flex: 1, minWidth: '280px' }}>
+            <div style={{ flex: 2 }}>
+              <Input
+                placeholder="Search expenses by title or notes..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div style={{ flex: 1, minWidth: '160px' }}>
+              <Select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                options={categoryOptions}
+                placeholder="All Categories"
+              />
+            </div>
+          </div>
+
+          <Button variant="primary" icon="+" onClick={() => setIsAddModalOpen(true)}>
+            Add New Expense
+          </Button>
+        </div>
+      </Card>
+
+      {/* SUMMARY BANNER */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justify: 'space-between',
+        padding: '1rem 1.25rem',
+        backgroundColor: 'var(--bg-card)',
+        borderRadius: 'var(--radius-lg)',
+        border: '1px solid var(--border-color)'
+      }}>
+        <div>
+          <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Showing </span>
+          <span style={{ fontWeight: 700 }}>{filteredExpenses.length}</span>
+          <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}> expenses</span>
+        </div>
+        <div>
+          <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginRight: '0.5rem' }}>Total Amount:</span>
+          <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-danger)' }}>
+            ₹{totalFilteredAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          </span>
+        </div>
+      </div>
+
+      {/* EXPENSE TABLE */}
+      <Card>
+        <Table columns={columns} data={filteredExpenses} emptyMessage="No expenses match your search filter." />
+      </Card>
+
+      <ExpenseFormModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
+    </div>
+  );
 };
 
 export default ExpensesPage;

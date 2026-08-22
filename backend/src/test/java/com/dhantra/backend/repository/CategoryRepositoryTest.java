@@ -17,12 +17,12 @@ class CategoryRepositoryTest {
 
     @Test
     void findByNameIgnoreCase_ShouldReturnCategory() {
-        Category category = new Category(null, "Health", "Medical expenses");
+        Category category = new Category(null, "Fitness", "Fitness & gym expenses");
         categoryRepository.save(category);
 
-        Optional<Category> found = categoryRepository.findByNameIgnoreCase("health");
+        Optional<Category> found = categoryRepository.findByNameIgnoreCase("fitness");
 
         assertTrue(found.isPresent());
-        assertEquals("Health", found.get().getName());
+        assertEquals("Fitness", found.get().getName());
     }
 }

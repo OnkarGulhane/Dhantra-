@@ -15,3 +15,5 @@ export const categoryService = {
         method: "DELETE",
     }),
 };
+
+export default categoryService;

@@ -15,3 +15,5 @@ export const expenseService = {
         method: "DELETE",
     }),
 };
+
+export default expenseService;

@@ -10,7 +10,7 @@
 
 | Service | Host / Port | Credentials / Target |
 |---|---|---|
-| **PostgreSQL 17 Database** | `127.0.0.1:5433` | DB: `dhantra_db`, User: `postgres`, Pass: `postgres` |
+| **PostgreSQL 17 Database** | `127.0.0.1:5433` | DB: `dhantra`, User: `postgres`, Pass: `postgres` |
 | **Spring Boot Backend API** | `http://localhost:8080` | Package: `com.dhantra.backend`, Port: `8080` |
 | **React Frontend SPA** | `http://localhost:3000` | Port: `3000` (Vite) |
 | **Flyway Migrations** | `database/migrations/` | `V1__initial_schema.sql`, `V2__introduce_dynamic_categories.sql` |

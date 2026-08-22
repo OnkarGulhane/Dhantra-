@@ -1,0 +1,47 @@
+import React from 'react';
+import { useTheme } from '../../context/ThemeContext';
+import Button from '../common/Button';
+
+export const Navbar = ({ activeTab, onQuickAddExpense, onMobileMenuToggle }) => {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    <header className="navbar">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button
+          className="btn btn-ghost btn-icon-only"
+          onClick={onMobileMenuToggle}
+          style={{ display: 'none' }} // Mobile responsive toggle
+          aria-label="Toggle menu"
+        >
+          ☰
+        </button>
+        <div>
+          <h2 style={{ fontSize: '1.25rem', textTransform: 'capitalize' }}>
+            {activeTab}
+          </h2>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            Welcome back to your financial control center
+          </p>
+        </div>
+      </div>
+
+      <div className="navbar-actions">
+        <Button
+          variant="secondary"
+          className="btn-icon-only"
+          onClick={toggleTheme}
+          title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </Button>
+
+        <Button variant="primary" icon="+" onClick={onQuickAddExpense}>
+          Add Expense
+        </Button>
+      </div>
+    </header>
+  );
+};
+
+export default Navbar;

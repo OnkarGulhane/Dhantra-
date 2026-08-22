@@ -1,13 +1,28 @@
-import React from "react";
+import React from 'react';
+import Button from '../components/common/Button';
 
 export const NotFound = ({ onGoHome }) => {
-    return (
-        <div className="not-found-page card" style={{ textAlign: "center", padding: "3rem" }}>
-            <h2>404 — Page Not Found</h2>
-            <p style={{ margin: "1rem 0", color: "var(--text-muted)" }}>The requested page does not exist.</p>
-            {onGoHome && <button onClick={onGoHome} className="btn-primary">Go to Dashboard</button>}
-        </div>
-    );
+  return (
+    <div style={{
+      textAlign: 'center',
+      padding: '4rem 1rem',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '1.25rem'
+    }}>
+      <h1 style={{ fontSize: '4rem', color: 'var(--color-primary)' }}>404</h1>
+      <h2>Page Not Found</h2>
+      <p style={{ color: 'var(--text-muted)', maxWidth: '400px' }}>
+        The page or section you are looking for does not exist or has been moved.
+      </p>
+      {onGoHome && (
+        <Button variant="primary" onClick={onGoHome}>
+          Return to Dashboard
+        </Button>
+      )}
+    </div>
+  );
 };
 
 export default NotFound;

@@ -1,34 +1,40 @@
-import React, { useState } from "react";
-import { AppProvider } from "./context/AppContext";
-import MainLayout from "./layouts/MainLayout";
-import Dashboard from "./pages/Dashboard";
-import ExpensesPage from "./pages/Expenses";
-import CategoriesPage from "./pages/Categories";
-import NotFound from "./pages/NotFound";
+import React, { useState } from 'react';
+import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import { AppProvider } from './context/AppContext';
+import MainLayout from './layouts/MainLayout';
+import Dashboard from './pages/Dashboard';
+import ExpensesPage from './pages/Expenses';
+import CategoriesPage from './pages/Categories';
+import NotFound from './pages/NotFound';
 
 export const App = () => {
-    const [currentTab, setCurrentTab] = useState("dashboard");
+  const [currentTab, setCurrentTab] = useState('dashboard');
 
-    const renderView = () => {
-        switch (currentTab) {
-            case "dashboard":
-                return <Dashboard />;
-            case "expenses":
-                return <ExpensesPage />;
-            case "categories":
-                return <CategoriesPage />;
-            default:
-                return <NotFound onGoHome={() => setCurrentTab("dashboard")} />;
-        }
-    };
+  const renderView = () => {
+    switch (currentTab) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'expenses':
+        return <ExpensesPage />;
+      case 'categories':
+        return <CategoriesPage />;
+      default:
+        return <NotFound onGoHome={() => setCurrentTab('dashboard')} />;
+    }
+  };
 
-    return (
+  return (
+    <ThemeProvider>
+      <ToastProvider>
         <AppProvider>
-            <MainLayout activeTab={currentTab} onTabChange={setCurrentTab}>
-                {renderView()}
-            </MainLayout>
+          <MainLayout activeTab={currentTab} onTabChange={setCurrentTab}>
+            {renderView()}
+          </MainLayout>
         </AppProvider>
-    );
+      </ToastProvider>
+    </ThemeProvider>
+  );
 };
 
 export default App;

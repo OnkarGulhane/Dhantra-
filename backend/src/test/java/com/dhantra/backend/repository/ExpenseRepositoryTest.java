@@ -22,7 +22,8 @@ class ExpenseRepositoryTest {
 
     @Test
     void existsByCategoryId_ShouldReturnTrueWhenExpensesExist() {
-        Category category = categoryRepository.save(new Category(null, "Food", "Dining"));
+        Category category = categoryRepository.findByNameIgnoreCase("Food")
+                .orElseGet(() -> categoryRepository.save(new Category(null, "Snacks", "Snacks & Dining")));
 
         Expense expense = new Expense();
         expense.setTitle("Coffee");
