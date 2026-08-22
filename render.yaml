@@ -1,0 +1,61 @@
+# Render Infrastructure as Code (Blueprint) for Dhantra Platform
+version: "1"
+
+services:
+  # 1. Spring Boot Backend Service (Docker)
+  - type: web
+    name: dhantra-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: singapore
+    plan: free
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: dhantra-postgres
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: dhantra-postgres
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: dhantra-postgres
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: dhantra-postgres
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: dhantra-postgres
+          property: password
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://dhantra-frontend.onrender.com,http://localhost:3000,http://localhost:5173
+
+  # 2. React Frontend Static Site
+  - type: web
+    name: dhantra-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    region: singapore
+    plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_APP_NAME
+        value: Dhantra
+      - key: VITE_API_BASE_URL
+        value: https://dhantra-backend.onrender.com/api
+
+databases:
+  # 3. Managed PostgreSQL Database Instance
+  - name: dhantra-postgres
+    databaseName: dhantra
+    user: postgres
+    region: singapore
+    plan: free
