@@ -5,6 +5,7 @@ import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import CategoryPieChart from '../components/dashboard/CategoryPieChart';
 import { useApp } from '../context/AppContext';
+import { ExpenseIcon, CategoryIcon, TrendingUpIcon, SearchIcon, SparklesIcon, ShieldCheckIcon } from '../components/common/Icons';
 
 export const Dashboard = () => {
   const { expenses, categories, isExpensesLoading, isCategoriesLoading, expensesError, fetchExpenses } = useApp();
@@ -67,6 +68,35 @@ export const Dashboard = () => {
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
+      {/* EXECUTIVE FINANCIAL HEALTH HERO BANNER */}
+      <div className="dashboard-hero-banner">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+          <div className="banner-sparkle-icon">
+            <SparklesIcon size={20} color="#ffffff" />
+          </div>
+          <span style={{ fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--primary-300)' }}>
+            Financial Overview & Health Analytics
+          </span>
+        </div>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
+          Master Your Wealth & Spending Velocity
+        </h1>
+        <p style={{ fontSize: '0.875rem', color: 'var(--text-on-primary)', opacity: 0.9, marginTop: '0.375rem', maxWidth: '700px' }}>
+          Real-time expense distribution, budget limits, and category insights synced live with Supabase & Render cloud engine.
+        </p>
+
+        <div className="banner-stats-row">
+          <div className="banner-stat-chip">
+            <ShieldCheckIcon size={16} color="#10b981" />
+            <span>Encrypted Sync</span>
+          </div>
+          <div className="banner-stat-chip">
+            <TrendingUpIcon size={16} color="#f59e0b" />
+            <span>{totalCount} Total Entries Logged</span>
+          </div>
+        </div>
+      </div>
+
       {/* METRICS CARDS ROW */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
         <Card glass interactive>
@@ -75,23 +105,21 @@ export const Dashboard = () => {
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                 Total Expenses
               </p>
-              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem' }}>
+              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem', fontWeight: 800 }}>
                 ₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </h2>
             </div>
             <div style={{
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--color-danger-bg)',
               color: 'var(--color-danger)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.25rem',
-              fontWeight: 'bold'
+              justifyContent: 'center'
             }}>
-              💸
+              <ExpenseIcon size={24} />
             </div>
           </div>
         </Card>
@@ -102,22 +130,21 @@ export const Dashboard = () => {
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                 Transactions
               </p>
-              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem' }}>
+              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem', fontWeight: 800 }}>
                 {totalCount}
               </h2>
             </div>
             <div style={{
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--color-info-bg)',
               color: 'var(--color-info)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.25rem'
+              justifyContent: 'center'
             }}>
-              🧾
+              <SearchIcon size={24} />
             </div>
           </div>
         </Card>
@@ -128,22 +155,21 @@ export const Dashboard = () => {
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                 Avg Transaction
               </p>
-              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem' }}>
+              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem', fontWeight: 800 }}>
                 ₹{Number(avgAmount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </h2>
             </div>
             <div style={{
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--color-warning-bg)',
               color: 'var(--color-warning)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.25rem'
+              justifyContent: 'center'
             }}>
-              📈
+              <TrendingUpIcon size={24} />
             </div>
           </div>
         </Card>
@@ -154,22 +180,21 @@ export const Dashboard = () => {
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                 Active Categories
               </p>
-              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem' }}>
+              <h2 style={{ fontSize: '1.75rem', marginTop: '0.25rem', fontWeight: 800 }}>
                 {categoryCount}
               </h2>
             </div>
             <div style={{
-              width: 44,
-              height: 44,
+              width: 46,
+              height: 46,
               borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--color-success-bg)',
               color: 'var(--color-success)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.25rem'
+              justifyContent: 'center'
             }}>
-              🏷️
+              <CategoryIcon size={24} />
             </div>
           </div>
         </Card>

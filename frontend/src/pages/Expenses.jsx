@@ -8,6 +8,7 @@ import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import ExpenseFormModal from '../components/expense/ExpenseFormModal';
 import { useApp } from '../context/AppContext';
+import { TrashIcon, PlusIcon } from '../components/common/Icons';
 
 export const ExpensesPage = () => {
   const { expenses, categories, isExpensesLoading, expensesError, fetchExpenses, deleteExpense } = useApp();
@@ -89,7 +90,7 @@ export const ExpensesPage = () => {
           isLoading={deletingId === item.id}
           onClick={() => handleDelete(item.id, item.title)}
         >
-          Delete
+          <TrashIcon size={14} /> Delete
         </Button>
       )
     }
@@ -124,8 +125,8 @@ export const ExpensesPage = () => {
             </div>
           </div>
 
-          <Button variant="primary" icon="+" onClick={() => setIsAddModalOpen(true)}>
-            Add New Expense
+          <Button variant="primary" onClick={() => setIsAddModalOpen(true)}>
+            <PlusIcon size={16} /> Add New Expense
           </Button>
         </div>
       </Card>
@@ -134,7 +135,7 @@ export const ExpensesPage = () => {
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         padding: '1rem 1.25rem',
         backgroundColor: 'var(--bg-card)',
         borderRadius: 'var(--radius-lg)',

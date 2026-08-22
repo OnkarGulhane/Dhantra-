@@ -6,6 +6,7 @@ import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import CategoryFormModal from '../components/category/CategoryFormModal';
 import { useApp } from '../context/AppContext';
+import { PlusIcon, TrashIcon, CategoryIcon } from '../components/common/Icons';
 
 export const CategoriesPage = () => {
   const { categories, expenses, isCategoriesLoading, categoriesError, fetchCategories, deleteCategory } = useApp();
@@ -90,7 +91,7 @@ export const CategoriesPage = () => {
           isLoading={deletingId === item.id}
           onClick={() => handleDelete(item.id, item.name)}
         >
-          Delete
+          <TrashIcon size={14} /> Delete
         </Button>
       )
     }
@@ -104,15 +105,15 @@ export const CategoriesPage = () => {
 
       {/* CATEGORIES HEADER BAR */}
       <Card>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h2 style={{ fontSize: '1.25rem' }}>Dynamic Category Management</h2>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Dynamic Category Management</h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
               Create, view, and manage custom expense categories in your platform.
             </p>
           </div>
-          <Button variant="primary" icon="+" onClick={() => setIsAddModalOpen(true)}>
-            Add Category
+          <Button variant="primary" onClick={() => setIsAddModalOpen(true)}>
+            <PlusIcon size={16} /> Add Category
           </Button>
         </div>
       </Card>
@@ -153,7 +154,7 @@ export const CategoriesPage = () => {
                   title="Delete category"
                   style={{ color: 'var(--color-danger)' }}
                 >
-                  ✕
+                  <TrashIcon size={16} />
                 </button>
               </div>
 

@@ -7,6 +7,7 @@ import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
+import { EditIcon, BudgetIcon } from '../components/common/Icons';
 
 // Default initial budget limits per category
 const DEFAULT_BUDGETS = {
@@ -96,7 +97,7 @@ export const BudgetsPage = () => {
               <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                 Overall Monthly Budget Target
               </p>
-              <h2 style={{ fontSize: '1.875rem', marginTop: '0.25rem' }}>
+              <h2 style={{ fontSize: '1.875rem', marginTop: '0.25rem', fontWeight: 800 }}>
                 ₹{totalSpentAll.toLocaleString('en-IN')}
                 <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400 }}>
                   {' '} / ₹{totalBudgetLimit.toLocaleString('en-IN')}
@@ -199,7 +200,7 @@ export const BudgetsPage = () => {
                       Remaining: <strong>₹{Math.max(limit - spent, 0).toLocaleString('en-IN')}</strong>
                     </span>
                     <Button variant="ghost" size="sm" onClick={() => handleEditBudget(cat.name)}>
-                      ✏️ Edit Limit
+                      <EditIcon size={14} /> Edit Limit
                     </Button>
                   </div>
                 </div>
