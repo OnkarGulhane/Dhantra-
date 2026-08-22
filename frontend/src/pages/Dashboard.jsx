@@ -4,6 +4,7 @@ import Table from '../components/common/Table';
 import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import CategoryPieChart from '../components/dashboard/CategoryPieChart';
+import IncomeVsExpenseChart from '../components/dashboard/IncomeVsExpenseChart';
 import CategoryBadge from '../components/common/CategoryBadge';
 import { useApp } from '../context/AppContext';
 import { ExpenseIcon, CategoryIcon, TrendingUpIcon, SearchIcon, SparklesIcon, ShieldCheckIcon } from '../components/common/Icons';
@@ -18,6 +19,10 @@ export const Dashboard = () => {
   if (expensesError) {
     return <ErrorMessage message={expensesError} onRetry={fetchExpenses} />;
   }
+
+  // Dynamic Time Greeting
+  const currentHour = new Date().getHours();
+  const timeGreeting = currentHour < 12 ? 'Good Morning' : currentHour < 18 ? 'Good Afternoon' : 'Good Evening';
 
   // Calculate Metrics
   const totalAmount = expenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
@@ -74,24 +79,24 @@ export const Dashboard = () => {
             <SparklesIcon size={20} color="#ffffff" />
           </div>
           <span style={{ fontSize: '0.8125rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--primary-300)' }}>
-            Financial Overview & Health Analytics
+            {timeGreeting}, Financial Master 👋
           </span>
         </div>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-          Master Your Wealth & Spending Velocity
+          Master Your Wealth & Cash Flow Velocity
         </h1>
         <p style={{ fontSize: '0.875rem', color: 'var(--text-on-primary)', opacity: 0.9, marginTop: '0.375rem', maxWidth: '700px' }}>
-          Real-time expense distribution, budget limits, and category insights synced live with Supabase & Render cloud engine.
+          Real-time income vs expense analytics, monthly spending trend graphs, category distribution, and cloud sync.
         </p>
 
         <div className="banner-stats-row">
           <div className="banner-stat-chip">
             <ShieldCheckIcon size={16} color="#10b981" />
-            <span>Encrypted Sync</span>
+            <span>Encrypted Supabase & Render Sync</span>
           </div>
           <div className="banner-stat-chip">
             <TrendingUpIcon size={16} color="#f59e0b" />
-            <span>{totalCount} Total Entries Logged</span>
+            <span>{totalCount} Total Transactions Logged</span>
           </div>
         </div>
       </div>
@@ -198,6 +203,9 @@ export const Dashboard = () => {
           </div>
         </Card>
       </div>
+
+      {/* MONTHLY SPENDING GRAPH & INCOME VS EXPENSES COMPARISON */}
+      <IncomeVsExpenseChart expenses={expenses} />
 
       {/* CATEGORY DISTRIBUTION PIE DIAGRAM */}
       <CategoryPieChart expenses={expenses} />

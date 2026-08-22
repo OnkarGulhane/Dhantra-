@@ -1,4 +1,5 @@
 import React from 'react';
+import Logo from '../common/Logo';
 import { DashboardIcon, ExpenseIcon, CategoryIcon, BudgetIcon, CloseIcon, ShieldCheckIcon } from '../common/Icons';
 
 export const Sidebar = ({ activeTab, onTabChange, isMobileOpen, onCloseMobile }) => {
@@ -20,9 +21,8 @@ export const Sidebar = ({ activeTab, onTabChange, isMobileOpen, onCloseMobile })
       )}
 
       <aside className={`sidebar ${isMobileOpen ? 'open' : ''}`}>
-        <div className="sidebar-header">
-          <div className="brand-logo">D</div>
-          <div className="brand-name">Dhantra</div>
+        <div className="sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem' }}>
+          <Logo size="md" />
           {isMobileOpen && (
             <button className="mobile-close-btn" onClick={onCloseMobile} aria-label="Close menu">
               <CloseIcon size={18} />
@@ -64,10 +64,10 @@ export const Sidebar = ({ activeTab, onTabChange, isMobileOpen, onCloseMobile })
             gap: '4px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-primary)', fontSize: '0.75rem', fontWeight: 700 }}>
-              <ShieldCheckIcon size={14} /> V1 Production Ready
+              <ShieldCheckIcon size={14} /> V1 Production Engine
             </div>
             <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-              Dhantra Financial Engine
+              Dhantra Cloud Analytics
             </p>
           </div>
         </div>
