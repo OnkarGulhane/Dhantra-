@@ -1,0 +1,29 @@
+# Environment files
+.env
+*.env.local
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backend Build & Target
+backend/target/
+backend/.mvn/
+backend/*.log
+
+# Frontend Dependencies & Build
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.nx/
+frontend/*.log
+
+# Coverage
+coverage/
+*.lcov

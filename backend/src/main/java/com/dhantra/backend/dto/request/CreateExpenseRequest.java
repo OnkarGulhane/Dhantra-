@@ -1,0 +1,42 @@
+package com.dhantra.backend.dto.request;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public class CreateExpenseRequest {
+
+    @NotBlank(message = "Title is required")
+    private String title;
+
+    @NotNull(message = "Amount is required")
+    @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
+    private BigDecimal amount;
+
+    @NotNull(message = "Category ID is required")
+    private Long categoryId;
+
+    @NotNull(message = "Expense date is required")
+    private LocalDate expenseDate;
+
+    private String description;
+
+    public CreateExpenseRequest() {}
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+    public Long getCategoryId() { return categoryId; }
+    public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+
+    public LocalDate getExpenseDate() { return expenseDate; }
+    public void setExpenseDate(LocalDate expenseDate) { this.expenseDate = expenseDate; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+}
