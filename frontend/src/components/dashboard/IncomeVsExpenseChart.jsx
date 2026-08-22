@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
-import { TrendingUpIcon, ShieldCheckIcon, EditIcon } from '../common/Icons';
+import { TrendingUpIcon, EditIcon } from '../common/Icons';
 
 export const IncomeVsExpenseChart = ({ expenses = [] }) => {
   const [monthlyIncome, setMonthlyIncome] = useState(() => {
@@ -17,47 +17,46 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
     localStorage.setItem('dhantra_monthly_income', monthlyIncome.toString());
   }, [monthlyIncome]);
 
-  // 100% PURE DYNAMIC MONTHLY GROUPING BASED ON ACTUAL DATABASE EXPENSE DATES
+  // GENERATE LAST 6 ROLLING MONTHS STRUCTURE WITH REAL DATABASE EXPENSE MAPPING
   const monthData = useMemo(() => {
-    if (!expenses || expenses.length === 0) return [];
+    const today = new Date();
+    const list = [];
 
-    const map = {};
-
+    // Calculate sum of expenses per month key (e.g. "Mar 26", "Aug 26")
+    const actualMap = {};
     expenses.forEach((item) => {
       if (!item.expenseDate) return;
-      const dateObj = new Date(item.expenseDate);
-      if (isNaN(dateObj.getTime())) return;
-
-      // Group key: e.g. "Aug 26" or "Aug 2026"
-      const monthKey = dateObj.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
-      const timestamp = dateObj.getTime();
-      const amount = Number(item.amount) || 0;
-
-      if (!map[monthKey]) {
-        map[monthKey] = {
-          month: monthKey,
-          expense: 0,
-          timestamp
-        };
-      }
-      map[monthKey].expense += amount;
+      const d = new Date(item.expenseDate);
+      if (isNaN(d.getTime())) return;
+      const monthKey = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      actualMap[monthKey] = (actualMap[monthKey] || 0) + (Number(item.amount) || 0);
     });
 
-    // Sort months chronologically
-    const sorted = Object.values(map).sort((a, b) => a.timestamp - b.timestamp);
+    // Generate past 6 calendar months ending with current month
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const label = d.toLocaleDateString('en-US', { month: 'short' });
+      const fullKey = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
 
-    // Compute income, savings, and savings rate per actual month
-    return sorted.map((d) => {
+      const expenseAmount = actualMap[fullKey] || 0;
       const income = monthlyIncome;
-      const savings = Math.max(income - d.expense, 0);
+      const savings = Math.max(income - expenseAmount, 0);
       const savingsRate = income > 0 ? ((savings / income) * 100).toFixed(1) : 0;
-      return {
-        ...d,
+      const isCurrentMonth = i === 0;
+
+      list.push({
+        month: label,
+        fullKey,
         income,
+        expense: expenseAmount,
         savings,
-        savingsRate
-      };
-    });
+        savingsRate,
+        isCurrentMonth,
+        hasEntries: expenseAmount > 0
+      });
+    }
+
+    return list;
   }, [expenses, monthlyIncome]);
 
   const handleSaveIncome = (e) => {
@@ -69,29 +68,12 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
     }
   };
 
-  // If no expense records exist in database
-  if (monthData.length === 0) {
-    return (
-      <Card glass title="Income vs Expenses & Monthly Spending Analytics">
-        <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-muted)' }}>
-          <TrendingUpIcon size={36} color="var(--color-primary)" />
-          <h4 style={{ fontSize: '1rem', fontWeight: 700, marginTop: '0.75rem', color: 'var(--text-primary)' }}>
-            No Expense Records Logged Yet
-          </h4>
-          <p style={{ fontSize: '0.8125rem', marginTop: '0.25rem', color: 'var(--text-muted)' }}>
-            Add your first expense to automatically generate your 100% dynamic monthly cash flow graph.
-          </p>
-        </div>
-      </Card>
-    );
-  }
-
-  // Calculate current active month stats (latest month logged)
-  const latestMonthStats = monthData[monthData.length - 1];
+  // Latest month stats (current month)
+  const currentMonthStats = monthData[monthData.length - 1];
   const maxVal = Math.max(...monthData.map(d => Math.max(d.income, d.expense)), 1000);
 
   return (
-    <Card glass title="Income vs Expenses & Monthly Spending Analytics" subtitle="100% Dynamic monthly cash flow graph generated strictly from your database records">
+    <Card glass title="Income vs Expenses & Monthly Spending Analytics" subtitle="6-Month rolling calendar comparison (0 entries = ₹0 expense logged)">
       <div className="income-chart-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
         {/* METRICS HEADER BANNER */}
@@ -146,13 +128,13 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
             )}
           </div>
 
-          {/* Latest Month Expense */}
+          {/* Current Month Expense */}
           <div>
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-              {latestMonthStats.month} Expenses
+              {currentMonthStats.month} Expenses
             </span>
             <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--color-danger)', marginTop: '0.25rem' }}>
-              ₹{latestMonthStats.expense.toLocaleString('en-IN')}
+              ₹{currentMonthStats.expense.toLocaleString('en-IN')}
             </h3>
           </div>
 
@@ -161,8 +143,8 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
             <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Net Savings Retained
             </span>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: latestMonthStats.savings > 0 ? 'var(--color-info)' : 'var(--color-danger)', marginTop: '0.25rem' }}>
-              ₹{latestMonthStats.savings.toLocaleString('en-IN')}
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: currentMonthStats.savings > 0 ? 'var(--color-info)' : 'var(--color-danger)', marginTop: '0.25rem' }}>
+              ₹{currentMonthStats.savings.toLocaleString('en-IN')}
             </h3>
           </div>
 
@@ -173,22 +155,22 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
               <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                {latestMonthStats.savingsRate}%
+                {currentMonthStats.savingsRate}%
               </h3>
-              <span className={`badge ${Number(latestMonthStats.savingsRate) >= 30 ? 'badge-primary' : 'badge-secondary'}`}>
-                {Number(latestMonthStats.savingsRate) >= 30 ? 'Healthy' : 'Moderate'}
+              <span className={`badge ${Number(currentMonthStats.savingsRate) >= 30 ? 'badge-primary' : 'badge-secondary'}`}>
+                {Number(currentMonthStats.savingsRate) >= 30 ? 'Healthy' : 'Moderate'}
               </span>
             </div>
           </div>
 
         </div>
 
-        {/* 100% PURE DYNAMIC COMPARISON BAR CHART */}
+        {/* 6-MONTH COMPARISON BAR CHART WITH REAL ENTRY DATA */}
         <div className="chart-bars-container" style={{ padding: '1rem 0' }}>
           
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-              Showing {monthData.length} active month{monthData.length > 1 ? 's' : ''} logged in database
+              6 Calendar Months View (Months without entries show ₹0 Expense)
             </span>
             <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.8125rem', fontWeight: 600 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
@@ -205,7 +187,7 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
           {/* Bar Graph Columns */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${monthData.length}, 1fr)`,
+            gridTemplateColumns: 'repeat(6, 1fr)',
             gap: '1rem',
             alignItems: 'flex-end',
             height: 220,
@@ -214,7 +196,7 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
           }}>
             {monthData.map((d) => {
               const incomeHeight = (d.income / maxVal) * 180;
-              const expenseHeight = (d.expense / maxVal) * 180;
+              const expenseHeight = d.expense > 0 ? (d.expense / maxVal) * 180 : 0;
               const isHovered = activeMonthHover === d.month;
 
               return (
@@ -247,9 +229,11 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
                       textAlign: 'center',
                       pointerEvents: 'none'
                     }}>
-                      <div style={{ fontWeight: 700 }}>{d.month} Data</div>
-                      <div style={{ color: 'var(--color-success)' }}>In: ₹{d.income.toLocaleString('en-IN')}</div>
-                      <div style={{ color: 'var(--color-danger)' }}>Out: ₹{d.expense.toLocaleString('en-IN')}</div>
+                      <div style={{ fontWeight: 700 }}>{d.month} Analytics</div>
+                      <div style={{ color: 'var(--color-success)' }}>Income: ₹{d.income.toLocaleString('en-IN')}</div>
+                      <div style={{ color: 'var(--color-danger)' }}>
+                        Expense: {d.expense > 0 ? `₹${d.expense.toLocaleString('en-IN')}` : '₹0 (No entries)'}
+                      </div>
                     </div>
                   )}
 
@@ -273,12 +257,12 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
                       style={{
                         width: '35%',
                         maxWidth: '28px',
-                        height: `${Math.max(expenseHeight, 8)}px`,
-                        backgroundColor: 'var(--color-danger)',
+                        height: `${Math.max(expenseHeight, d.expense > 0 ? 8 : 2)}px`,
+                        backgroundColor: d.expense > 0 ? 'var(--color-danger)' : 'var(--border-subtle)',
                         borderRadius: '4px 4px 0 0',
                         opacity: isHovered ? 1 : 0.85,
                         transition: 'height 0.5s ease, opacity 0.2s ease',
-                        boxShadow: isHovered ? '0 0 12px rgba(239, 68, 68, 0.4)' : 'none'
+                        boxShadow: isHovered && d.expense > 0 ? '0 0 12px rgba(239, 68, 68, 0.4)' : 'none'
                       }}
                     />
                   </div>
@@ -286,10 +270,10 @@ export const IncomeVsExpenseChart = ({ expenses = [] }) => {
                   {/* Month Label */}
                   <span style={{
                     fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: 'var(--text-primary)'
+                    fontWeight: d.isCurrentMonth ? 800 : 600,
+                    color: d.isCurrentMonth ? 'var(--color-primary)' : 'var(--text-muted)'
                   }}>
-                    {d.month}
+                    {d.month} {d.isCurrentMonth ? '(Now)' : ''}
                   </span>
                 </div>
               );
