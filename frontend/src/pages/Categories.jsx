@@ -5,8 +5,9 @@ import Button from '../components/common/Button';
 import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import CategoryFormModal from '../components/category/CategoryFormModal';
+import CategoryBadge from '../components/common/CategoryBadge';
 import { useApp } from '../context/AppContext';
-import { PlusIcon, TrashIcon, CategoryIcon } from '../components/common/Icons';
+import { PlusIcon, TrashIcon, getCategoryIconInfo } from '../components/common/Icons';
 
 export const CategoriesPage = () => {
   const { categories, expenses, isCategoriesLoading, categoriesError, fetchCategories, deleteCategory } = useApp();
@@ -38,26 +39,10 @@ export const CategoriesPage = () => {
       accessor: 'name',
       render: (item) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{
-            width: 32,
-            height: 32,
-            borderRadius: 'var(--radius-sm)',
-            backgroundColor: 'var(--color-primary-light)',
-            color: 'var(--color-primary)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 'bold',
-            fontSize: '0.875rem'
-          }}>
-            {item.name.charAt(0)}
-          </div>
-          <div>
-            <div style={{ fontWeight: 600 }}>{item.name}</div>
-            {item.description && (
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{item.description}</div>
-            )}
-          </div>
+          <CategoryBadge name={item.name} size={18} />
+          {item.description && (
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>({item.description})</span>
+          )}
         </div>
       )
     },
@@ -109,7 +94,7 @@ export const CategoriesPage = () => {
           <div>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Dynamic Category Management</h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-              Create, view, and manage custom expense categories in your platform.
+              Create, view, and manage custom expense categories with dedicated vector icons.
             </p>
           </div>
           <Button variant="primary" onClick={() => setIsAddModalOpen(true)}>
@@ -118,27 +103,28 @@ export const CategoriesPage = () => {
         </div>
       </Card>
 
-      {/* CATEGORY GRID CARDS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.25rem' }}>
+      {/* CATEGORY GRID CARDS WITH SEMANTIC SVG VECTOR ICONS */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
         {categories.map((cat) => {
           const expCount = getExpenseCountForCategory(cat.id);
+          const iconInfo = getCategoryIconInfo(cat.name);
+          const IconComponent = iconInfo.icon;
+
           return (
             <Card key={cat.id} glass interactive>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
                   <div style={{
-                    width: 40,
-                    height: 40,
+                    width: 44,
+                    height: 44,
                     borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'var(--color-primary-light)',
-                    color: 'var(--color-primary)',
+                    backgroundColor: iconInfo.bg,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontWeight: 700,
-                    fontSize: '1.125rem'
+                    flexShrink: 0
                   }}>
-                    {cat.name.charAt(0)}
+                    <IconComponent size={24} color={iconInfo.color} />
                   </div>
                   <div>
                     <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{cat.name}</h3>

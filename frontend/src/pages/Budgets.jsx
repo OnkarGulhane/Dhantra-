@@ -7,7 +7,7 @@ import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
-import { EditIcon, BudgetIcon } from '../components/common/Icons';
+import { EditIcon, getCategoryIconInfo } from '../components/common/Icons';
 
 // Default initial budget limits per category
 const DEFAULT_BUDGETS = {
@@ -128,7 +128,7 @@ export const BudgetsPage = () => {
         </div>
       </Card>
 
-      {/* CATEGORY BUDGET ALLOCATION GRID */}
+      {/* CATEGORY BUDGET ALLOCATION GRID WITH INDIVIDUAL CATEGORY VECTOR ICONS */}
       <div>
         <h3 style={{ fontSize: '1.125rem', marginBottom: '1rem', fontWeight: 700 }}>
           Category Monthly Budget Limits & Spending
@@ -141,6 +141,8 @@ export const BudgetsPage = () => {
             const pct = Math.min(((spent / limit) * 100), 100).toFixed(1);
             const isOver = spent > limit;
             const isWarning = spent >= limit * 0.75 && !isOver;
+            const iconInfo = getCategoryIconInfo(cat.name);
+            const IconComponent = iconInfo.icon;
 
             let statusColor = 'var(--color-success)';
             let statusBg = 'var(--color-success-bg)';
@@ -160,11 +162,25 @@ export const BudgetsPage = () => {
               <Card key={cat.id} interactive>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <h4 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{cat.name}</h4>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                        {cat.description || 'Category budget'}
-                      </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 'var(--radius-md)',
+                        backgroundColor: iconInfo.bg,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        <IconComponent size={20} color={iconInfo.color} />
+                      </div>
+                      <div>
+                        <h4 style={{ fontSize: '1.125rem', fontWeight: 700 }}>{cat.name}</h4>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          {cat.description || 'Category budget'}
+                        </p>
+                      </div>
                     </div>
                     <span style={{
                       fontSize: '0.75rem',

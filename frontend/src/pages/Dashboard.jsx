@@ -4,6 +4,7 @@ import Table from '../components/common/Table';
 import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import CategoryPieChart from '../components/dashboard/CategoryPieChart';
+import CategoryBadge from '../components/common/CategoryBadge';
 import { useApp } from '../context/AppContext';
 import { ExpenseIcon, CategoryIcon, TrendingUpIcon, SearchIcon, SparklesIcon, ShieldCheckIcon } from '../components/common/Icons';
 
@@ -40,9 +41,7 @@ export const Dashboard = () => {
     {
       header: 'Category',
       render: (item) => (
-        <span className="badge badge-primary">
-          {item.category?.name || 'Uncategorized'}
-        </span>
+        <CategoryBadge name={item.category?.name || 'Uncategorized'} />
       )
     },
     {

@@ -7,6 +7,7 @@ import Select from '../components/common/Select';
 import Loader from '../components/common/Loader';
 import ErrorMessage from '../components/common/ErrorMessage';
 import ExpenseFormModal from '../components/expense/ExpenseFormModal';
+import CategoryBadge from '../components/common/CategoryBadge';
 import { useApp } from '../context/AppContext';
 import { TrashIcon, PlusIcon } from '../components/common/Icons';
 
@@ -57,9 +58,7 @@ export const ExpensesPage = () => {
     {
       header: 'Category',
       render: (item) => (
-        <span className="badge badge-primary">
-          {item.category?.name || 'Uncategorized'}
-        </span>
+        <CategoryBadge name={item.category?.name || 'Uncategorized'} />
       )
     },
     {

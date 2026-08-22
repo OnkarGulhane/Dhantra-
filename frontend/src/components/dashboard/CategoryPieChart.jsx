@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import Card from '../common/Card';
-
-const PALETTE = [
-  { main: '#6366f1', light: 'rgba(99, 102, 241, 0.15)' }, // Indigo
-  { main: '#10b981', light: 'rgba(16, 185, 129, 0.15)' },  // Emerald
-  { main: '#f43f5e', light: 'rgba(244, 63, 94, 0.15)' },   // Rose
-  { main: '#f59e0b', light: 'rgba(245, 158, 11, 0.15)' },   // Amber
-  { main: '#06b6d4', light: 'rgba(6, 182, 212, 0.15)' },    // Cyan
-  { main: '#8b5cf6', light: 'rgba(139, 92, 246, 0.15)' },  // Purple
-  { main: '#ec4899', light: 'rgba(236, 72, 153, 0.15)' },  // Pink
-  { main: '#64748b', light: 'rgba(100, 116, 139, 0.15)' }  // Slate
-];
+import { getCategoryIconInfo } from '../common/Icons';
 
 export const CategoryPieChart = ({ expenses = [] }) => {
   const [hoveredCategory, setHoveredCategory] = useState(null);
@@ -27,12 +17,15 @@ export const CategoryPieChart = ({ expenses = [] }) => {
   });
 
   const categories = Object.entries(categoryTotals)
-    .map(([name, amount], index) => ({
-      name,
-      amount,
-      percentage: grandTotal > 0 ? (amount / grandTotal) * 100 : 0,
-      color: PALETTE[index % PALETTE.length]
-    }))
+    .map(([name, amount]) => {
+      const iconInfo = getCategoryIconInfo(name);
+      return {
+        name,
+        amount,
+        percentage: grandTotal > 0 ? (amount / grandTotal) * 100 : 0,
+        iconInfo
+      };
+    })
     .sort((a, b) => b.amount - a.amount);
 
   if (categories.length === 0 || grandTotal === 0) {
@@ -68,7 +61,7 @@ export const CategoryPieChart = ({ expenses = [] }) => {
   return (
     <Card
       title="Category Expense Distribution"
-      subtitle="Visual percentage breakdown of spending across categories"
+      subtitle="Visual percentage breakdown of spending across categories with individual vector icons"
       glass
     >
       <div className="pie-chart-container">
@@ -93,7 +86,7 @@ export const CategoryPieChart = ({ expenses = [] }) => {
                   cy={center}
                   r={radius}
                   fill="transparent"
-                  stroke={slice.color.main}
+                  stroke={slice.iconInfo.color}
                   strokeWidth={isHovered ? strokeWidth + 6 : strokeWidth}
                   strokeDasharray={slice.strokeDasharray}
                   strokeDashoffset={slice.strokeDashoffset}
@@ -124,10 +117,11 @@ export const CategoryPieChart = ({ expenses = [] }) => {
           </div>
         </div>
 
-        {/* Categories Legend List */}
+        {/* Categories Legend List with Semantic Icons */}
         <div className="pie-chart-legend">
           {categories.map((cat) => {
             const isHovered = hoveredCategory === cat.name;
+            const IconComponent = cat.iconInfo.icon;
             return (
               <div
                 key={cat.name}
@@ -136,12 +130,23 @@ export const CategoryPieChart = ({ expenses = [] }) => {
                 onMouseLeave={() => setHoveredCategory(null)}
               >
                 <div className="legend-info">
-                  <span className="legend-dot" style={{ backgroundColor: cat.color.main }} />
+                  <div style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: cat.iconInfo.bg,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <IconComponent size={16} color={cat.iconInfo.color} />
+                  </div>
                   <span className="legend-name">{cat.name}</span>
                 </div>
                 <div className="legend-stats">
                   <span className="legend-amount">₹{cat.amount.toLocaleString('en-IN')}</span>
-                  <span className="legend-badge" style={{ backgroundColor: cat.color.light, color: cat.color.main }}>
+                  <span className="legend-badge" style={{ backgroundColor: cat.iconInfo.bg, color: cat.iconInfo.color }}>
                     {cat.percentage.toFixed(1)}%
                   </span>
                 </div>

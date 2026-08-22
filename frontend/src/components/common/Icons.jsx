@@ -18,6 +18,7 @@ const IconWrapper = ({ children, size = 20, color = 'currentColor', className = 
   </svg>
 );
 
+// Navigation & Feature Icons
 export const DashboardIcon = (props) => (
   <IconWrapper {...props}>
     <rect x="3" y="3" width="7" height="9" rx="1.5" />
@@ -50,6 +51,63 @@ export const BudgetIcon = (props) => (
   </IconWrapper>
 );
 
+// Individual Category Icons
+export const FoodIcon = (props) => (
+  <IconWrapper {...props}>
+    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+    <line x1="6" y1="1" x2="6" y2="4" />
+    <line x1="10" y1="1" x2="10" y2="4" />
+    <line x1="14" y1="1" x2="14" y2="4" />
+  </IconWrapper>
+);
+
+export const TransportIcon = (props) => (
+  <IconWrapper {...props}>
+    <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.05 10.9 2 11.2 2 11.5V16c0 .6.4 1 1 1h2" />
+    <circle cx="7" cy="17" r="2" />
+    <circle cx="17" cy="17" r="2" />
+  </IconWrapper>
+);
+
+export const ShoppingIcon = (props) => (
+  <IconWrapper {...props}>
+    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 0 1-8 0" />
+  </IconWrapper>
+);
+
+export const BillsIcon = (props) => (
+  <IconWrapper {...props}>
+    <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z" />
+    <line x1="8" y1="6" x2="16" y2="6" />
+    <line x1="8" y1="10" x2="16" y2="10" />
+    <line x1="8" y1="14" x2="12" y2="14" />
+  </IconWrapper>
+);
+
+export const HealthIcon = (props) => (
+  <IconWrapper {...props}>
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+  </IconWrapper>
+);
+
+export const EntertainmentIcon = (props) => (
+  <IconWrapper {...props}>
+    <polygon points="5 3 19 12 5 21 5 3" />
+  </IconWrapper>
+);
+
+export const OtherIcon = (props) => (
+  <IconWrapper {...props}>
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+    <line x1="12" y1="22.08" x2="12" y2="12" />
+  </IconWrapper>
+);
+
+// UI & Utility Icons
 export const SunIcon = (props) => (
   <IconWrapper {...props}>
     <circle cx="12" cy="12" r="4" />
@@ -140,3 +198,31 @@ export const MenuIcon = (props) => (
     <line x1="3" y1="18" x2="21" y2="18" />
   </IconWrapper>
 );
+
+/**
+ * Smart Category Icon Resolver - Context-aware vector icon selector
+ */
+export const getCategoryIconInfo = (categoryName = '') => {
+  const name = categoryName.toLowerCase();
+
+  if (name.includes('food') || name.includes('din') || name.includes('groc') || name.includes('eat') || name.includes('rest')) {
+    return { icon: FoodIcon, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', name: 'Food & Dining' };
+  }
+  if (name.includes('trans') || name.includes('fuel') || name.includes('cab') || name.includes('taxi') || name.includes('bike') || name.includes('car') || name.includes('ride')) {
+    return { icon: TransportIcon, color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.15)', name: 'Transport & Travel' };
+  }
+  if (name.includes('shop') || name.includes('cloth') || name.includes('store') || name.includes('item') || name.includes('buy')) {
+    return { icon: ShoppingIcon, color: '#ec4899', bg: 'rgba(236, 72, 153, 0.15)', name: 'Shopping & Retail' };
+  }
+  if (name.includes('bill') || name.includes('util') || name.includes('rent') || name.includes('phone') || name.includes('elec') || name.includes('net')) {
+    return { icon: BillsIcon, color: '#6366f1', bg: 'rgba(99, 102, 241, 0.15)', name: 'Bills & Utilities' };
+  }
+  if (name.includes('health') || name.includes('med') || name.includes('fit') || name.includes('gym') || name.includes('doc') || name.includes('care')) {
+    return { icon: HealthIcon, color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', name: 'Health & Medical' };
+  }
+  if (name.includes('enter') || name.includes('mov') || name.includes('sub') || name.includes('game') || name.includes('fun') || name.includes('show')) {
+    return { icon: EntertainmentIcon, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', name: 'Entertainment & Leisure' };
+  }
+
+  return { icon: OtherIcon, color: '#64748b', bg: 'rgba(100, 116, 139, 0.15)', name: categoryName || 'Other' };
+};
