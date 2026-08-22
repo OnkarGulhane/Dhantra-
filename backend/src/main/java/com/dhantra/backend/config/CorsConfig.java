@@ -3,11 +3,14 @@ package com.dhantra.backend.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class CorsConfig {
@@ -16,33 +19,34 @@ public class CorsConfig {
     private String allowedOrigins;
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                String[] origins = Arrays.stream(allowedOrigins.split(","))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .toArray(String[]::new);
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
 
-                boolean hasWildcard = Arrays.stream(origins).anyMatch(s -> s.equals("*"));
+        // Split comma-separated origins from environment variable
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
 
-                CorsRegistration registration = registry.addMapping("/**");
+        boolean hasWildcard = origins.contains("*");
 
-                if (hasWildcard) {
-                    registration.allowedOriginPatterns("*")
-                            .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                            .allowedHeaders("*")
-                            .allowCredentials(false)
-                            .maxAge(3600);
-                } else {
-                    registration.allowedOrigins(origins)
-                            .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
-                            .allowedHeaders("*")
-                            .allowCredentials(true)
-                            .maxAge(3600);
-                }
-            }
-        };
+        if (hasWildcard || origins.isEmpty()) {
+            config.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            // Allow specified origins plus wildcard patterns for dynamic subdomains (e.g. Vercel previews)
+            config.setAllowedOriginPatterns(List.of("*"));
+        }
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsFilter(source);
     }
 }
